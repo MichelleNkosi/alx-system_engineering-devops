@@ -1,3 +1,2 @@
 #!/bin/bash
 for file in *.html; do [ ! -e "../$file" ] || [ "$file" -nt "../$file" ]; if [ $? -eq 0 ]; then cp -u "$file" "../"; echo "Copied $file to ../"; fi; done
-
