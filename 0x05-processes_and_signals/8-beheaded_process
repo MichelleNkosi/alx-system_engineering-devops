@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Forcefully kill the 7-highlander process by name using SIGKILL
+pkill -9 -f "./7-highlander"

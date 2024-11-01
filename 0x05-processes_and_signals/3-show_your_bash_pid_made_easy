@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Find processes containing "bash" in their name and display their PIDs and names
+# shellcheck disable=SC2009
+
+for pid in /proc/[0-9]*/comm; do
+    if grep -qi "bash" "$pid" 2>/dev/null; then
+        echo "$(basename "$(dirname "$pid")") bash"
+    fi
+done

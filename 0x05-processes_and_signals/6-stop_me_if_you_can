@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Find the PID of the 4-to_infinity_and_beyond process and terminate it without using kill or killall
+pkill -f "./4-to_infinity_and_beyond"
