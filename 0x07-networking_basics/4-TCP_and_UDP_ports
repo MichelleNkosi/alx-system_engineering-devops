@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# This script displays all listening TCP and UDP sockets with their associated PID and program name
+
+# Function to parse /proc/net files and map them to PIDs and process names
+parse_proc_net() {
+  local proto=$1
+  local file="/proc/net/$proto"
+  echo "Proto Local Address           PID/Program name"
+  
+  # Read each line in the specified /proc/net file
+  while read -r line; do
+    # Extract socket information
+    local local_address=$(echo "$line" | awk '{print $2}')
+    local inode=$(echo "$line" | awk '{print $10}')
+    
+    # Skip header lines and empty inodes
+    [[ "$inode" == "0" || -z "$inode" ]] && continue
+    
+    # Convert the address to human-readable format
+    local ip_hex="${local_address%:*}"
+    local port_hex="${local_address##*:}"
+    local ip_dec=$(printf "%d.%d.%d.%d" 0x${ip_hex:6:2} 0x${ip_hex:4:2} 0x${ip_hex:2:2} 0x${ip_hex:0:2})
+    local port_dec=$((16#$port_hex))
+    
+    # Find the PID and program name associated with the inode
+    local pid=$(lsof -i :"$port_dec" -n | grep LISTEN | awk '{print $2}' | head -n 1)
+    local program=$(ps -p "$pid" -o comm=)
+    
+    # Output the result if a PID and program name are found
+    if [[ -n "$pid" && -n "$program" ]]; then
+      printf "%s %-23s %s/%s\n" "$proto" "$ip_dec:$port_dec" "$pid" "$program"
+    fi
+  done < <(tail -n +2 "$file") # Skip header line
+}
+
+# Call the function for both TCP and UDP
+parse_proc_net "tcp"
+parse_proc_net "udp"
+
