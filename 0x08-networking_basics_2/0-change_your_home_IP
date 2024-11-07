@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# This script configures the localhost and facebook.com IP resolutions
+
+# Ensure the script is run with sudo or as root
+if [ "$EUID" -ne 0 ]; then
+  echo "Please run as root or with sudo"
+  exit 1
+fi
+
+# Define the hosts file path and a temporary file
+HOSTS_FILE="/etc/hosts"
+TEMP_FILE="/tmp/hosts.tmp"
+
+# Copy the hosts file to a temporary location
+cp "$HOSTS_FILE" "$TEMP_FILE"
+
+# Update the temporary file for localhost and facebook.com
+sed -i '/127.0.0.2 localhost/d' "$TEMP_FILE"
+echo "127.0.0.2 localhost" >> "$TEMP_FILE"
+
+sed -i '/8.8.8.8 facebook.com/d' "$TEMP_FILE"
+echo "8.8.8.8 facebook.com" >> "$TEMP_FILE"
+
+# Move the updated temporary file back to /etc/hosts
+mv "$TEMP_FILE" "$HOSTS_FILE"
+
+echo "IP configurations have been updated."
+
