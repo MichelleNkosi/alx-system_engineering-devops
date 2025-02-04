@@ -1,11 +1,27 @@
 #!/usr/bin/env bash
 # This script configures Nginx to run as the nginx user and listen on port 8080.
 
-# Update Nginx configuration to run as nginx user
-sed -i 's/user .*/user nginx;/' /etc/nginx/nginx.conf
+set -e  # Exit immediately if a command exits with a non-zero status
 
-# Update Nginx to listen on port 8080
-sed -i 's/listen 80;/listen 8080;/' /etc/nginx/sites-available/default
+# Define file paths
+NGINX_CONF="/etc/nginx/nginx.conf"
+NGINX_DEFAULT="/etc/nginx/sites-available/default"
+
+# Ensure Nginx config exists before modifying
+if [[ -f "$NGINX_CONF" ]]; then
+    sed -i 's/^user .*/user nginx;/' "$NGINX_CONF"
+else
+    echo "Error: $NGINX_CONF not found."
+    exit 1
+fi
+
+# Ensure the default site config exists before modifying
+if [[ -f "$NGINX_DEFAULT" ]]; then
+    sed -i 's/listen 80;/listen 8080;/' "$NGINX_DEFAULT"
+else
+    echo "Error: $NGINX_DEFAULT not found."
+    exit 1
+fi
 
 # Restart Nginx to apply changes
 service nginx restart
