@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     # Fetch users
     users = requests.get(url + "users").json()
-    
+
     # Dictionary to store all tasks per user
     all_tasks = {}
 
